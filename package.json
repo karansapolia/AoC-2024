@@ -1,0 +1,16 @@
+{
+  "name": "2024",
+  "type": "module",
+  "packageManager": "yarn@4.5.3",
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "prettier": "^3.4.1",
+    "typescript": "^5.7.2"
+  },
+  "scripts": {
+    "tsc": "tsc"
+  },
+  "engines": {
+    "node": ">=22.11.0"
+  }
+}
