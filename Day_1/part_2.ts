@@ -1,4 +1,4 @@
-import { changeFiletoTwoLists } from "./helpers";
+import { changeFiletoTwoLists } from "./helpers.js";
 
 const similarityScore = async (file: string, encoding: BufferEncoding) => {
   const { leftList, rightList } = await changeFiletoTwoLists(file, encoding);
@@ -7,10 +7,11 @@ const similarityScore = async (file: string, encoding: BufferEncoding) => {
   rightList.sort();
 
   const individualScores = leftList.map(
-    (leftListElem, index) =>
+    (leftListElem: number, index: number) =>
       leftListElem *
-      rightList.filter((rightListElem) => rightListElem === leftListElem)
-        .length,
+      rightList.filter(
+        (rightListElem: number) => rightListElem === leftListElem,
+      ).length,
   );
 
   const similarityScore = individualScores.reduce((sum, curr) => sum + curr, 0);

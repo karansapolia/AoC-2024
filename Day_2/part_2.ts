@@ -5,11 +5,29 @@ const changeFileToReports = async (
   encoding: BufferEncoding,
 ): Promise<number[][]> => {
   const data = await readFile(file, { encoding });
-  // console.log(data);
 
-  let reports = data.split("\n").map((report) => report.split(" ").map(Number));
+  const reports = data
+    .trim()
+    .split("\n")
+    .map((report: string) => report.split(" ").map(Number));
 
   return reports;
+};
+
+const isSafe = (report: number[]) => {
+  let increasing = null; // Initially null, then set to true or false
+
+  for (let i = 1; i < report.length; i++) {
+    const diff = report[i] - report[i - 1];
+    if (Math.abs(diff) < 1 || Math.abs(diff) > 3) return false; // Check absolute diff
+
+    if (increasing === null) {
+      increasing = diff > 0; // Set based on first difference
+    } else if ((increasing && diff < 0) || (!increasing && diff > 0)) {
+      return false; // Change in direction, not safe
+    }
+  }
+  return true; // If we get here, it's safe
 };
 
 const numberOfSafeReport = async (
@@ -17,56 +35,25 @@ const numberOfSafeReport = async (
   encoding: BufferEncoding,
 ): Promise<number> => {
   const reports = await changeFileToReports(file, encoding);
-  console.log(reports.length);
+  let safeCount = 0;
 
-  let unSafeCounts = new Array(reports.length).fill(0);
-
-  const safeReportsCount = reports.reduce((sum, report, reportIndex) => {
-    let trend = 0;
-    let isSafe = true;
-
-    console.log("OG report ", report);
-
-    let i = 1;
-    while (i < report.length) {
-      console.log("i value at start of iteration: ", i);
-      // create trend when at 1st element
-      if (i === 1) {
-        console.log("trend checked");
-        trend = report[i] - report[i - 1];
-      }
-
-      // catch unsafe cases
-      if (
-        trend === 0 ||
-        Math.abs(report[i] - report[i - 1]) > 3 ||
-        Math.abs(report[i] - report[i - 1]) < 1 ||
-        (report[i] - report[i - 1] > 0 && trend <= 0) ||
-        (report[i] - report[i - 1] < 0 && trend >= 0)
-      ) {
-        if (unSafeCounts[reportIndex] > 0) {
-          isSafe = false;
-          break;
-        } else {
-          report.splice(i, 1);
-          console.log("spliced report: ", report);
-          unSafeCounts[reportIndex]++;
-          console.log(
-            `unSafeCounts[${reportIndex}]: `,
-            unSafeCounts[reportIndex],
-          );
-          i = 0;
-        }
-      }
-
-      i++;
+  for (const report of reports) {
+    if (isSafe(report)) {
+      safeCount++;
+      continue;
     }
 
-    console.log("isSafe? ", isSafe);
-    return isSafe ? sum + 1 : sum;
-  }, 0);
+    for (let i = 0; i < report.length; i++) {
+      const modifiedReport = [...report];
+      modifiedReport.splice(i, 1);
+      if (isSafe(modifiedReport)) {
+        safeCount++;
+        break;
+      }
+    }
+  }
 
-  return safeReportsCount;
+  return safeCount;
 };
 
 console.log(await numberOfSafeReport("./Day_2/input.txt", "utf8"));

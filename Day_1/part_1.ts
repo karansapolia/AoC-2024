@@ -1,4 +1,4 @@
-import { changeFiletoTwoLists } from "./helpers";
+import { changeFiletoTwoLists } from "./helpers.js";
 
 const getListDistance = async (
   file: string,
@@ -11,7 +11,7 @@ const getListDistance = async (
 
   let totalDistance = 0;
 
-  leftList.forEach((elem, index) => {
+  leftList.forEach((elem: number, index: number) => {
     totalDistance += Math.abs(elem - rightList[index]);
   });
 
